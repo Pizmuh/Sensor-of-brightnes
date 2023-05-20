@@ -1,0 +1,79 @@
+#include <LiquidCrystal.h>
+#include <Mapf.h>
+ 
+const int rs = 13, en = 12, d4 = 11, d5 = 10, d6 = 9, d7 = 8;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+int sum = 0;
+int output;
+#define POTENCIOMETER A0
+#define TERMISTOR A1
+#define LUX A2
+byte customChar[] = {
+  B00000,
+  B00000,
+  B00100,
+  B01110,
+  B11111,
+  B00000,
+  B00000,
+  B00000
+};
+byte customChar2[] = {
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B11111,
+  B01110,
+  B00100,
+  B00000
+};
+
+void setup() {
+  lcd.begin(16, 2);
+  lcd.createChar(1, customChar);
+  lcd.createChar(2, customChar2);
+  lcd.home();
+  
+}
+
+void loop() {
+  lcd.setCursor(0, 0);
+  lcd.print("Tmer= ");// 
+  for (int i = 0; i<10; i++){
+    sum +=analogRead(TERMISTOR);
+   }
+  sum /=10;
+  //lcd.print(mapf(sum, 0, 1023, 0, 5));
+  lcd.print(90- sum/10);
+  
+  lcd.setCursor(0, 1);
+  lcd.print("Tset= "); //19,3 == 35 20,3 = 455
+ 
+  lcd.print( mapf(analogRead(POTENCIOMETER),0,900,20,30));
+  lcd.setCursor(11, 1);
+  lcd.write(1);
+  if ((int)(mapf(analogRead(POTENCIOMETER),0,900,20,30)) == (90-sum/10)){
+    lcd.setCursor(11, 1);
+    lcd.write(2);
+  }
+
+  output = analogRead(LUX);
+   int led_value = map(output, 0, 200, 0, 255);
+  analogWrite(4, led_value);
+  
+  Serial.print("Tmer= ");
+  Serial.print((30 - (analogRead(A1))));//(19.3/35)
+ 
+  Serial.print("Tset= "); // 19,3 == 35 20,3 = 455
+  Serial.print(analogRead(A0));
+  delay(1000);
+  
+  }
+
+
+
+
+
+
+  
